@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compression\INetCompression.cs" />
     <Compile Include="Encryption\NetAESEncryption.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -78,6 +79,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Encryption\NetXteaEncryption.cs" />
+    <Compile Include="Compression\NetDeflateCompression.cs" />
     <Compile Include="NamespaceDoc.cs" />
     <Compile Include="NetBigInteger.cs" />
     <Compile Include="NetBitVector.cs" />
