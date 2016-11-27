@@ -32,7 +32,7 @@ namespace Lidgren.Network
 				ReleaseMessage(CreateIncomingMessage(NetIncomingMessageType.VerboseDebugMessage, message));
 		}
 
-		[Conditional("DEBUG")]
+		//[Conditional("DEBUG")]
 		internal void LogDebug(string message)
 		{
 #if __ANDROID__
