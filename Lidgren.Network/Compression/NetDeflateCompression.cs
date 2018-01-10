@@ -73,15 +73,22 @@ namespace Lidgren.Network
 
         public bool TryDecompress(NetIncomingMessage msg)
         {
+            if ((msg.LengthBits - msg.Position) < 1)
+                throw new InvalidDataException("Packet is missing compressed flag!");
             var isCompressed = msg.ReadBoolean();
             if (!isCompressed)
                 return false;
 
-            var uncompressedLengthInBits = (int)msg.ReadUInt32(LengthBits);
+            // needs to be at least 1 byte of compressed data present
+            if ((msg.LengthBits - msg.Position) < (LengthBits + 8))
+                throw new InvalidDataException($"Compressed packet is too short (length = {msg.LengthBits} bits)!");
+
+            int uncompressedLengthInBits = (int)msg.ReadUInt32(LengthBits);
             var uncompressedLength = NetUtility.BytesToHoldBits(uncompressedLengthInBits);
+            var compressedLength = NetUtility.BytesToHoldBits(msg.LengthBits - (int)msg.Position);
 
             var data = _peer.GetStorage(uncompressedLength);
-            using (var compressedStream = new MemoryStream(msg.Data, HeaderLength, msg.LengthBytes - HeaderLength))
+            using (var compressedStream = new MemoryStream(msg.Data, HeaderLength, compressedLength))
             {
                 using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress))
                 {
