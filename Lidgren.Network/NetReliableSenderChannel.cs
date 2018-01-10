@@ -83,8 +83,7 @@ namespace Lidgren.Network
 
 				m_anyStoredResends = true;
 
-				double t = storedMsg.LastSent;
-				if (t > 0 && (now - t) > m_resendDelay)
+				if (IsTimeToResend(i, now))
 				{
 					// deduce sequence number
 					/*
@@ -124,6 +123,21 @@ namespace Lidgren.Network
 				NetException.Assert(num == GetAllowedSends());
 			}
 		}
+
+	    private bool IsTimeToResend(int messageIndex, double now)
+	    {
+	        var storedMsg = m_storedMessages[messageIndex];
+	        if (storedMsg.LastSent <= 0.0)
+	            return false;
+            var avgRtt = m_connection.m_averageRoundtripTime;
+            if (avgRtt <= 0.0)
+                avgRtt = 0.1; // "default" resend is based on 100 ms roundtrip time
+            var resendDelay = 0.035 + (avgRtt * 1.1);
+            if (storedMsg.NumSent > 1)
+	            resendDelay += ((1 << (storedMsg.NumSent - 1)) * 0.1);
+	        resendDelay = Math.Min(1, resendDelay);
+	        return (now - storedMsg.LastSent) > resendDelay;
+	    }
 
 		private void ExecuteSend(double now, NetOutgoingMessage message)
 		{

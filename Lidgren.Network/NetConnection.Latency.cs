@@ -6,7 +6,7 @@ namespace Lidgren.Network
 	{
 		private double m_sentPingTime;
 		private int m_sentPingNumber;
-		private double m_averageRoundtripTime;
+		internal double m_averageRoundtripTime;
 		private double m_timeoutDeadline = double.MaxValue;
 
 		// local time value + m_remoteTimeOffset = remote time value
